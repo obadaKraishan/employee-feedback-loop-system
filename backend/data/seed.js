@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
 const Employee = require('../models/Employee');
 const Feedback = require('../models/Feedback');
 const connectDB = require('../config/db');
@@ -8,13 +9,71 @@ const { analyzeSentiment } = require('../services/sentimentAnalysisService');
 dotenv.config();
 connectDB();
 
-const employees = [...Array(100).keys()].map(i => ({
-  employeeId: `EMP${i + 1}`,
-  name: `Employee ${i + 1}`,
-  department: ['IT', 'HR', 'Finance', 'Marketing', 'Sales'][Math.floor(Math.random() * 5)],
-  position: ['Developer', 'Manager', 'Analyst', 'Engineer', 'Consultant'][Math.floor(Math.random() * 5)],
-  email: `employee${i + 1}@company.com`,
-}));
+const employees = [
+  {
+    employeeId: 'EMP1',
+    name: 'John Doe',
+    department: 'IT',
+    position: 'Developer',
+    email: 'john.doe@company.com',
+    role: 'Employee',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP2',
+    name: 'Jane Smith',
+    department: 'HR',
+    position: 'Manager',
+    email: 'jane.smith@company.com',
+    role: 'Manager',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP3',
+    name: 'Robert Brown',
+    department: 'Finance',
+    position: 'Manager',
+    email: 'robert.brown@company.com',
+    role: 'Manager',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP4',
+    name: 'Emma Wilson',
+    department: 'Sales',
+    position: 'Consultant',
+    email: 'emma.wilson@company.com',
+    role: 'Employee',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP5',
+    name: 'Oliver Taylor',
+    department: 'Marketing',
+    position: 'Engineer',
+    email: 'oliver.taylor@company.com',
+    role: 'Employee',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP6',
+    name: 'Sophia Johnson',
+    department: 'IT',
+    position: 'Manager',
+    email: 'sophia.johnson@company.com',
+    role: 'Manager',
+    password: bcrypt.hashSync('password123', 10),
+  },
+  {
+    employeeId: 'EMP7',
+    name: 'William Davis',
+    department: 'All',
+    position: 'CEO',
+    email: 'william.davis@company.com',
+    role: 'CEO',
+    password: bcrypt.hashSync('password123', 10),
+  }
+];
 
 const feedbacks = [
   {
