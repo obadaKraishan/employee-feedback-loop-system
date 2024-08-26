@@ -1,22 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-function EmployeeList() {
-  const [employees, setEmployees] = useState([]);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`);
-        setEmployees(data);
-      } catch (error) {
-        console.error('Failed to fetch employees:', error);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
-
+function EmployeeList({ employees }) {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Employee List</h2>
