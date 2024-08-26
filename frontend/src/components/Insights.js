@@ -2,9 +2,9 @@ import React from 'react';
 
 function Insights() {
   return (
-    <div>
-      <h2>Actionable Insights</h2>
-      {/* Display insights */}
+    <div className="p-4 bg-white shadow-md rounded">
+      <h2 className="text-xl font-bold">Actionable Insights</h2>
+      <p className="text-gray-600">Insights based on feedback sentiment will be displayed here.</p>
     </div>
   );
 }

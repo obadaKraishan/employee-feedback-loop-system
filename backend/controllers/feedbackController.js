@@ -1,4 +1,5 @@
 const Feedback = require('../models/Feedback');
+const { analyzeSentiment } = require('../services/sentimentAnalysisService');
 
 // @desc    Submit feedback
 // @route   POST /api/feedback
@@ -7,12 +8,15 @@ const submitFeedback = async (req, res) => {
   const { employeeId, message, isAnonymous } = req.body;
 
   try {
+    const sentimentScore = analyzeSentiment(message);
+
     const feedback = await Feedback.create({
       employeeId: isAnonymous ? 'Anonymous' : employeeId,
       message,
+      sentimentScore,
       isAnonymous,
     });
-    
+
     res.status(201).json(feedback);
   } catch (error) {
     res.status(400).json({ message: 'Failed to submit feedback', error: error.message });
