@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FeedbackList from '../components/FeedbackList';
 import Insights from '../components/Insights';
 import EmployeeList from '../components/EmployeeList';
@@ -9,21 +10,35 @@ import Sidebar from '../components/Sidebar';
 function Dashboard() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (!userInfo) {
+      navigate('/login');
+    }
+
     const fetchFeedbacks = async () => {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`, {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      });
       setFeedbacks(data.slice(0, 5)); // Show only the first 5 feedbacks
     };
 
     const fetchEmployees = async () => {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`, {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      });
       setEmployees(data.slice(0, 5)); // Show only the first 5 employees
     };
 
     fetchFeedbacks();
     fetchEmployees();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="flex flex-row">
