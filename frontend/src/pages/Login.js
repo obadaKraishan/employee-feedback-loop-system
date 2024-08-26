@@ -13,11 +13,13 @@ function Login() {
     try {
       const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, { email, password });
       localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate('/dashboard');
+      console.log('Navigating to dashboard');
+      navigate('/dashboard'); // Redirect to the dashboard after successful login
     } catch (error) {
       setError('Invalid email or password');
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

@@ -130,17 +130,21 @@ const feedbacks = [
 
 const importData = async () => {
   try {
-    await Employee.deleteMany(); // Clear existing employees
-    await Feedback.deleteMany(); // Clear existing feedback
+    await Employee.deleteMany();
+    console.log('Existing employees removed');
+    await Feedback.deleteMany();
+    console.log('Existing feedback removed');
 
     await Employee.insertMany(employees);
+    console.log('Employees seeded');
 
     for (const fb of feedbacks) {
       fb.sentimentScore = analyzeSentiment(fb.message);
       await Feedback.create(fb);
     }
+    console.log('Feedbacks seeded');
 
-    console.log('Demo data imported!');
+    console.log('Demo data imported successfully!');
     process.exit();
   } catch (error) {
     console.error(`Error: ${error.message}`);
