@@ -13,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
+app.use('/api/employees', require('./routes/employeeRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running...');
