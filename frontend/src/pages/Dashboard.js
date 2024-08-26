@@ -4,7 +4,6 @@ import FeedbackList from '../components/FeedbackList';
 import Insights from '../components/Insights';
 import EmployeeList from '../components/EmployeeList';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 function Dashboard() {
@@ -12,33 +11,46 @@ function Dashboard() {
   const [employees, setEmployees] = useState([]);
   const navigate = useNavigate();
 
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    if (!userInfo) {
+    if (!userInfo || userInfo.role === 'Employee') {
       navigate('/login');
     }
 
     const fetchFeedbacks = async () => {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`, {
+      let url = `${process.env.REACT_APP_API_URL}/api/feedback`;
+      if (userInfo.role === 'Manager') {
+        url += `/department/${userInfo.department}`;
+      } else if (userInfo.role === 'CEO') {
+        url = `${process.env.REACT_APP_API_URL}/api/feedback`;
+      }
+
+      const { data } = await axios.get(url, {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
+          Authorization: `Bearer ${userInfo.token}`,
+        },
       });
-      setFeedbacks(data.slice(0, 5)); // Show only the first 5 feedbacks
+      setFeedbacks(data.slice(0, 5));
     };
 
     const fetchEmployees = async () => {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`, {
+      let url = `${process.env.REACT_APP_API_URL}/api/employees`;
+      if (userInfo.role === 'Manager') {
+        url += `/department/${userInfo.department}`;
+      }
+
+      const { data } = await axios.get(url, {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
+          Authorization: `Bearer ${userInfo.token}`,
+        },
       });
-      setEmployees(data.slice(0, 5)); // Show only the first 5 employees
+      setEmployees(data.slice(0, 5));
     };
 
     fetchFeedbacks();
     fetchEmployees();
-  }, [navigate]);
+  }, [navigate, userInfo]);
 
   return (
     <div className="flex flex-row">
@@ -46,21 +58,21 @@ function Dashboard() {
       <div className="flex-grow p-6">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
 
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2">Employee Overview</h2>
-          <EmployeeList employees={employees} />
-          <Link to="/employees" className="text-blue-500 hover:underline">View All Employees</Link>
-        </section>
+        {employees.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-2">Employee Overview</h2>
+            <EmployeeList employees={employees} />
+          </section>
+        )}
 
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2">Recent Feedback</h2>
-          <FeedbackList feedbacks={feedbacks} />
-          <Link to="/feedbacks" className="text-blue-500 hover:underline">View All Feedback</Link>
-        </section>
+        {feedbacks.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-2">Recent Feedback</h2>
+            <FeedbackList feedbacks={feedbacks} />
+          </section>
+        )}
 
-        <section>
-          <Insights />
-        </section>
+        {userInfo.role !== 'Employee' && <Insights />}
       </div>
     </div>
   );

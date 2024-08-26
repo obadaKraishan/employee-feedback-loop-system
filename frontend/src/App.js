@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
-import Feedback from './pages/Feedback';
+import MyFeedbacks from './pages/MyFeedbacks';
+import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import AllEmployees from './pages/AllEmployees';
 import AllFeedbacks from './pages/AllFeedbacks';
@@ -20,10 +21,21 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/feedback" element={userInfo ? <Feedback /> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={userInfo ? <Dashboard /> : <Navigate to="/login" />} />
-            <Route path="/employees" element={userInfo ? <AllEmployees /> : <Navigate to="/login" />} />
-            <Route path="/feedbacks" element={userInfo ? <AllFeedbacks /> : <Navigate to="/login" />} />
+            {userInfo?.role === 'Employee' ? (
+              <>
+                <Route path="/my-feedbacks" element={<MyFeedbacks />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/" element={<Navigate to="/my-feedbacks" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/employees" element={<AllEmployees />} />
+                <Route path="/feedbacks" element={<AllFeedbacks />} />
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+              </>
+            )}
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
         <Footer />

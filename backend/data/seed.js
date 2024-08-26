@@ -3,11 +3,20 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const Employee = require('../models/Employee');
 const Feedback = require('../models/Feedback');
+const Department = require('../models/Department'); // Import Department model
 const connectDB = require('../config/db');
 const { analyzeSentiment } = require('../services/sentimentAnalysisService');
 
 dotenv.config();
 connectDB();
+
+const departments = [
+  { name: 'IT' },
+  { name: 'HR' },
+  { name: 'Finance' },
+  { name: 'Sales' },
+  { name: 'Marketing' },
+];
 
 const employees = [
   {
@@ -130,10 +139,13 @@ const feedbacks = [
 
 const importData = async () => {
   try {
+    await Department.deleteMany();
     await Employee.deleteMany();
-    console.log('Existing employees removed');
     await Feedback.deleteMany();
-    console.log('Existing feedback removed');
+    console.log('Existing data removed');
+
+    await Department.insertMany(departments);
+    console.log('Departments seeded');
 
     await Employee.insertMany(employees);
     console.log('Employees seeded');

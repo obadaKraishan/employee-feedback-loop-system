@@ -1,30 +1,28 @@
-const express = require('express');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const Employee = require('../models/Employee');
-const { protect, authorize } = require('../middleware/authMiddleware');
 
-const router = express.Router();
+const protect = async (req, res, next) => {
+  let token;
 
-// Login Route
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  const employee = await Employee.findOne({ email });
-
-  if (employee && (await bcrypt.compare(password, employee.password))) {
-    res.json({
-      _id: employee._id,
-      name: employee.name,
-      email: employee.email,
-      role: employee.role,
-      token: jwt.sign({ id: employee._id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-      }),
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+      req.employee = await Employee.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ message: 'Not authorized, token failed' });
+    }
   }
-});
 
-module.exports = router;
+  if (!token) {
+    res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
+
+module.exports = { protect };
