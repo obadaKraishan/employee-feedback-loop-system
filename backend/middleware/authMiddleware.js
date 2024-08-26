@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
 const Employee = require('../models/Employee');
 
 // Middleware to protect routes
-const protect = asyncHandler(async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -21,13 +23,13 @@ const protect = asyncHandler(async (req, res, next) => {
   if (!token) {
     res.status(401).json({ message: 'Not authorized, no token' });
   }
-});
+};
 
-// Middleware to authorize roles
+// Middleware to authorize based on roles
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.employee.role)) {
-      return res.status(403).json({ message: 'Forbidden: You do not have permission to access this resource' });
+      return res.status(403).json({ message: 'User role not authorized' });
     }
     next();
   };
