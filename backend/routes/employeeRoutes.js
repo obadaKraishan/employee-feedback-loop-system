@@ -1,5 +1,5 @@
 const express = require('express');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const Employee = require('../models/Employee');
 const bcrypt = require('bcryptjs');
 
@@ -7,8 +7,8 @@ const router = express.Router();
 
 // @desc    Get all employees
 // @route   GET /api/employees
-// @access  Private
-router.get('/', protect, async (req, res) => {
+// @access  Private (CEO and Manager)
+router.get('/', protect, authorize('CEO', 'Manager'), async (req, res) => {
   try {
     const employees = await Employee.find({});
     res.status(200).json(employees);

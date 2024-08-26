@@ -9,7 +9,14 @@ function AllFeedbacks() {
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`);
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+
         setFeedbacks(data);
       } catch (error) {
         console.error('Failed to fetch feedbacks:', error);

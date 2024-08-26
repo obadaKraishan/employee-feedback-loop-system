@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Employee = require('../models/Employee');
 
-// Middleware to protect routes
 const protect = async (req, res, next) => {
   let token;
 
@@ -28,7 +27,6 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Middleware to authorize based on roles
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.employee.role)) {

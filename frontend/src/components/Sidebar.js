@@ -15,21 +15,21 @@ function Sidebar() {
       <h2 className="text-xl font-bold p-4">Menu</h2>
       <ul>
         <li className="p-4 hover:bg-gray-700"><Link to="/">Home</Link></li>
-        {userInfo.role === 'CEO' && (
+        {userInfo && userInfo.role === 'CEO' && (
           <>
             <li className="p-4 hover:bg-gray-700"><Link to="/dashboard">Dashboard</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/employees">All Employees</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/feedbacks">All Feedback</Link></li>
           </>
         )}
-        {userInfo.role === 'Manager' && (
+        {userInfo && userInfo.role === 'Manager' && (
           <>
             <li className="p-4 hover:bg-gray-700"><Link to="/dashboard">Dashboard</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/employees">My Department Employees</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/feedbacks">My Department Feedback</Link></li>
           </>
         )}
-        {userInfo.role === 'Employee' && (
+        {userInfo && userInfo.role === 'Employee' && (
           <>
             <li className="p-4 hover:bg-gray-700"><Link to="/my-feedbacks">My Feedback</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/profile">My Profile</Link></li>

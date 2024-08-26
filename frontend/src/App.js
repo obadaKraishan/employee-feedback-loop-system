@@ -25,14 +25,14 @@ function App() {
               <>
                 <Route path="/my-feedbacks" element={<MyFeedbacks />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/" element={<Navigate to="/my-feedbacks" />} />
+                <Route path="*" element={<Navigate to="/my-feedbacks" />} />
               </>
             ) : (
               <>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/employees" element={<AllEmployees />} />
                 <Route path="/feedbacks" element={<AllFeedbacks />} />
-                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             )}
             <Route path="*" element={<Navigate to="/" />} />

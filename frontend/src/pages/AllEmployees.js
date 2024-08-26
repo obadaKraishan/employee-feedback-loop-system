@@ -15,7 +15,14 @@ function AllEmployees() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`);
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/employees`, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+
         setEmployees(data);
         setFilteredEmployees(data);
       } catch (error) {

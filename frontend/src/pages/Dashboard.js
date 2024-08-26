@@ -9,58 +9,70 @@ import Sidebar from '../components/Sidebar';
 function Dashboard() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
-    // Redirect normal employees away from the dashboard
     if (!userInfo || userInfo.role === 'Employee') {
       navigate('/login');
       return;
     }
 
-    const fetchFeedbacks = async () => {
-      let url = `${process.env.REACT_APP_API_URL}/api/feedback`;
-      if (userInfo.role === 'Manager') {
-        url += `/department/${userInfo.department}`;
-      } else if (userInfo.role === 'CEO') {
-        url = `${process.env.REACT_APP_API_URL}/api/feedback`;
-      }
-
+    const fetchDashboardData = async () => {
       try {
-        const { data } = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
-        setFeedbacks(data.slice(0, 5));
+        // URLs based on user role
+        let feedbackUrl = `${process.env.REACT_APP_API_URL}/api/feedback`;
+        let employeeUrl = `${process.env.REACT_APP_API_URL}/api/employees`;
+
+        if (userInfo.role === 'Manager') {
+          feedbackUrl += `/department/${userInfo.department}`;
+          employeeUrl += `/department/${userInfo.department}`;
+        }
+
+        // Fetch both feedbacks and employees simultaneously
+        const [feedbackResponse, employeeResponse] = await Promise.all([
+          axios.get(feedbackUrl, {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`, // Include the token
+            },
+          }),
+          axios.get(employeeUrl, {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`, // Include the token
+            },
+          }),
+        ]);
+
+        console.log('Feedbacks:', feedbackResponse.data);
+        console.log('Employees:', employeeResponse.data);
+
+        setFeedbacks(feedbackResponse.data.slice(0, 5));
+        setEmployees(employeeResponse.data.slice(0, 5));
+        setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching dashboard data:', error);
+
+        if (error.response && error.response.status === 401) {
+          console.error('Unauthorized: Token might be invalid or expired.', error);
+          alert('Session expired. Please log in again.');
+          localStorage.removeItem('userInfo');
+          navigate('/login');
+        } else if (error.message === 'Network Error') {
+          alert('Network error. Please check your server and try again.');
+        } else {
+          alert('Error fetching dashboard data. Please check the console for details.');
+        }
       }
     };
 
-    const fetchEmployees = async () => {
-      let url = `${process.env.REACT_APP_API_URL}/api/employees`;
-      if (userInfo.role === 'Manager') {
-        url += `/department/${userInfo.department}`;
-      }
-
-      try {
-        const { data } = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
-        setEmployees(data.slice(0, 5));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchFeedbacks();
-    fetchEmployees();
+    fetchDashboardData();
   }, [navigate, userInfo]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Display a loading indicator while data is being fetched
+  }
 
   return (
     <div className="flex flex-row">

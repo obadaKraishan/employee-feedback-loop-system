@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // Register the required components with Chart.js
 ChartJS.register(
@@ -23,12 +24,18 @@ ChartJS.register(
 
 function Insights() {
   const [chartData, setChartData] = useState(null);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const fetchFeedbackData = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`);
-        
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback`, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+
         if (data && data.length > 0) {
           const departments = ['IT', 'HR', 'Finance', 'Marketing', 'Sales'];
           const sentimentData = departments.map(dept => {
@@ -53,12 +60,20 @@ function Insights() {
           });
         }
       } catch (error) {
-        console.error('Error fetching feedback data:', error);
+        if (error.response && error.response.status === 401) {
+          console.error('Unauthorized: Token might be invalid or expired.', error);
+          alert('Session expired. Please log in again.');
+          localStorage.removeItem('userInfo');
+          navigate('/login'); // Use navigate to redirect to login page
+        } else {
+          console.error('Error fetching feedback data:', error);
+          alert('Error fetching feedback data. Please check the console for details.');
+        }
       }
     };
 
     fetchFeedbackData();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="p-4 bg-white shadow-md rounded">
