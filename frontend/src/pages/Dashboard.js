@@ -14,8 +14,10 @@ function Dashboard() {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
+    // Redirect normal employees away from the dashboard
     if (!userInfo || userInfo.role === 'Employee') {
       navigate('/login');
+      return;
     }
 
     const fetchFeedbacks = async () => {
@@ -26,12 +28,16 @@ function Dashboard() {
         url = `${process.env.REACT_APP_API_URL}/api/feedback`;
       }
 
-      const { data } = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      setFeedbacks(data.slice(0, 5));
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        setFeedbacks(data.slice(0, 5));
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     const fetchEmployees = async () => {
@@ -40,12 +46,16 @@ function Dashboard() {
         url += `/department/${userInfo.department}`;
       }
 
-      const { data } = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      setEmployees(data.slice(0, 5));
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        setEmployees(data.slice(0, 5));
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchFeedbacks();
