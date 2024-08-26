@@ -3,15 +3,23 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Feedback from './pages/Feedback';
 import Dashboard from './pages/Dashboard';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/feedback" element={<Feedback />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/feedback" element={<Feedback />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </Router>
   );
 }
