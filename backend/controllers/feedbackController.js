@@ -4,9 +4,6 @@ const { analyzeSentiment } = require('../services/sentimentAnalysisService');
 // @desc    Submit feedback
 // @route   POST /api/feedback
 // @access  Private
-// @desc    Submit feedback
-// @route   POST /api/feedback
-// @access  Private
 const submitFeedback = async (req, res) => {
   const { message, department, isAnonymous } = req.body;
   const employeeId = req.employee._id; // Assuming you attach employee info to req.employee in the middleware
@@ -36,12 +33,12 @@ const getFeedback = async (req, res) => {
   try {
     let feedback;
 
-    if (req.user.role === 'CEO') {
+    if (req.employee.role === 'CEO') {
       // CEO can see all feedbacks
       feedback = await Feedback.find({});
-    } else if (req.user.role === 'Manager') {
+    } else if (req.employee.role === 'Manager') {
       // Managers can see feedbacks from their department only
-      feedback = await Feedback.find({ department: req.user.department });
+      feedback = await Feedback.find({ department: req.employee.department });
     } else {
       // Regular employees should not have access to this route; alternatively, you can implement logic to restrict or customize the feedback they see.
       return res.status(403).json({ message: 'Access denied' });
@@ -58,7 +55,7 @@ const getFeedback = async (req, res) => {
 // @access  Private
 const getMyFeedbacks = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find({ employeeId: req.user._id });
+    const feedbacks = await Feedback.find({ employeeId: req.employee._id });
     res.json(feedbacks);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch feedbacks' });

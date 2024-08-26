@@ -3,23 +3,35 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
+// Load environment variables
 dotenv.config();
 
+// Connect to the database
 connectDB();
 
 const app = express();
+
+// Use middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/feedback', require('./routes/feedbackRoutes'));
-app.use('/api/employees', require('./routes/employeeRoutes'));
-app.use('/api/auth', require('./routes/authRoutes'));  // Add this line
-app.use('/api/departments', require('./routes/departmentRoutes'));
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
+const departmentRoutes = require('./routes/departmentRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+
+// Use routes
+app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

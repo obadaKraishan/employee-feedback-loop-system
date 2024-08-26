@@ -1,6 +1,7 @@
 const express = require('express');
-const Employee = require('../models/Employee');
 const { protect } = require('../middleware/authMiddleware');
+const Employee = require('../models/Employee');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 

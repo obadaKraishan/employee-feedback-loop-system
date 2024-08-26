@@ -1,6 +1,6 @@
 const express = require('express');
-const Department = require('../models/Department');
 const { protect } = require('../middleware/authMiddleware');
+const Department = require('../models/Department');
 
 const router = express.Router();
 
