@@ -4,6 +4,7 @@ import Insights from '../components/Insights';
 import EmployeeList from '../components/EmployeeList';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 function Dashboard() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -25,16 +26,9 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="w-full md:w-1/4 bg-gray-800 text-white">
-        <h2 className="text-xl font-bold p-4">Menu</h2>
-        <ul>
-          <li className="p-4 hover:bg-gray-700"><Link to="/">Home</Link></li>
-          <li className="p-4 hover:bg-gray-700"><Link to="/dashboard">Dashboard</Link></li>
-          <li className="p-4 hover:bg-gray-700"><Link to="/feedback">Submit Feedback</Link></li>
-        </ul>
-      </div>
-      <div className="w-full md:w-3/4 p-6">
+    <div className="flex flex-row">
+      <Sidebar />
+      <div className="flex-grow p-6">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
 
         <section className="mb-8">
