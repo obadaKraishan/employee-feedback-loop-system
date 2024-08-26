@@ -9,7 +9,7 @@ function FeedbackList({ feedbacks }) {
           {feedbacks.map((feedback) => (
             <li key={feedback._id} className="p-4 bg-gray-100 rounded shadow">
               <strong>{feedback.isAnonymous ? 'Anonymous' : feedback.employeeId}</strong>: {feedback.message}
-              <div className="text-sm text-gray-600">Sentiment Score: {feedback.sentimentScore}</div>
+              <div className="text-sm text-gray-600">Sentiment: {feedback.sentiment}</div>
             </li>
           ))}
         </ul>

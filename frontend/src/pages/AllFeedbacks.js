@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FeedbackList from '../components/FeedbackList';
+import Sidebar from '../components/Sidebar';
 
 function AllFeedbacks() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -19,9 +20,12 @@ function AllFeedbacks() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">All Feedback</h1>
-      <FeedbackList feedbacks={feedbacks} />
+    <div className="flex flex-row">
+      <Sidebar />
+      <div className="flex-grow p-6">
+        <h1 className="text-2xl font-bold mb-4">All Feedback</h1>
+        <FeedbackList feedbacks={feedbacks} />
+      </div>
     </div>
   );
 }

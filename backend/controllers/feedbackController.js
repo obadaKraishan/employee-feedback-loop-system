@@ -8,12 +8,12 @@ const submitFeedback = async (req, res) => {
   const { employeeId, message, isAnonymous } = req.body;
 
   try {
-    const sentimentScore = analyzeSentiment(message);
+    const sentiment = analyzeSentiment(message);
 
     const feedback = await Feedback.create({
       employeeId: isAnonymous ? 'Anonymous' : employeeId,
       message,
-      sentimentScore,
+      sentiment,
       isAnonymous,
     });
 

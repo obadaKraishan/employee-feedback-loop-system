@@ -9,9 +9,10 @@ const feedbackSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  sentimentScore: {
-    type: Number,
-    default: null,
+  sentiment: {
+    type: String,
+    enum: ['positive', 'negative', 'neutral'], // Define allowed values
+    default: 'neutral',
   },
   date: {
     type: Date,

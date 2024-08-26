@@ -4,10 +4,18 @@ const sentiment = new Sentiment();
 
 // @desc    Analyze sentiment of the feedback message
 // @param   message: string
-// @return  sentimentScore: number
+// @return  sentiment: string ("positive", "negative", "neutral")
 const analyzeSentiment = (message) => {
   const result = sentiment.analyze(message);
-  return result.score;
+  const sentimentScore = result.score;
+
+  if (sentimentScore > 0) {
+    return 'positive';
+  } else if (sentimentScore < 0) {
+    return 'negative';
+  } else {
+    return 'neutral';
+  }
 };
 
 module.exports = {
