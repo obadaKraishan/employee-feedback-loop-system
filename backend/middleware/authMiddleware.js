@@ -30,6 +30,16 @@ const protect = async (req, res, next) => {
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.employee.role)) {
+      // Check if the employee is trying to close their own feedback
+      if (
+        req.employee.role === 'Employee' &&
+        req.method === 'PUT' &&
+        req.route.path.includes('/status') &&
+        req.body.status === 'Closed' &&
+        req.feedback.employeeId.toString() === req.employee._id.toString()
+      ) {
+        return next(); // Allow employee to close their feedback
+      }
       return res.status(403).json({ message: 'User role not authorized' });
     }
     next();

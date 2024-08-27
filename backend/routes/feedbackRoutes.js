@@ -1,7 +1,12 @@
 const express = require('express');
-const { submitFeedback, getFeedback, getMyFeedbacks, updateFeedbackStatus } = require('../controllers/feedbackController');
+const {
+  submitFeedback,
+  getFeedback,
+  getMyFeedbacks,
+  updateFeedbackStatus,
+  addComment,
+} = require('../controllers/feedbackController');
 const { protect, authorize } = require('../middleware/authMiddleware');
-const Feedback = require('../models/Feedback');  // Import the Feedback model
 
 const router = express.Router();
 
@@ -22,39 +27,12 @@ router.get('/mine', protect, getMyFeedbacks);
 
 // @desc    Update feedback status
 // @route   PUT /api/feedback/:feedbackId/status
-// @access  Private (Manager, CEO)
-router.put('/:feedbackId/status', protect, authorize('Manager', 'CEO'), updateFeedbackStatus);
+// @access  Private (All Employees for their own feedback; Managers and CEO for any feedback)
+router.put('/:feedbackId/status', protect, updateFeedbackStatus);
 
 // @desc    Add comment to feedback
 // @route   POST /api/feedback/:feedbackId/comment
 // @access  Private (All Employees)
-router.post('/:feedbackId/comment', protect, async (req, res) => {
-    try {
-        const { feedbackId } = req.params;
-        const { commentText, isAnonymous } = req.body;
-        const userInfo = req.employee;
-
-        const feedback = await Feedback.findById(feedbackId);
-
-        if (!feedback) {
-            return res.status(404).json({ message: 'Feedback not found' });
-        }
-
-        const newComment = {
-            commenter: userInfo.role,
-            commentText,
-            isAnonymous,
-            timestamp: new Date(),
-        };
-
-        feedback.comments.push(newComment);
-        await feedback.save();
-
-        res.status(201).json(newComment);
-    } catch (error) {
-        console.error('Error adding comment:', error);
-        res.status(500).json({ message: 'Failed to add comment', error: error.message });
-    }
-});
+router.post('/:feedbackId/comment', protect, addComment);
 
 module.exports = router;

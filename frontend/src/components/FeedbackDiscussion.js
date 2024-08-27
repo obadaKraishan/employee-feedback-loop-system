@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStatusChange }) {
@@ -8,6 +8,14 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (userInfo && userInfo.role) {
+      setUserRole(userInfo.role);
+    }
+  }, []);
 
   const submitComment = async () => {
     try {
@@ -81,14 +89,22 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           className="ml-2 p-2 border border-gray-300 rounded"
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
+          disabled={userRole === 'Employee' && status === 'Closed'} // Disable for employees if feedback is closed
         >
-          <option value="Open">Open</option>
-          <option value="Under Process">Under Process</option>
-          <option value="Closed">Closed</option>
+          <option value="Open" disabled={userRole === 'Employee' && status !== 'Open'}>
+            Open
+          </option>
+          <option value="Under Process" disabled={userRole === 'Employee'}>
+            Under Process
+          </option>
+          <option value="Closed" disabled={userRole === 'Employee' && status === 'Closed'}>
+            Closed
+          </option>
         </select>
         <button
           onClick={updateStatus}
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={userRole === 'Employee' && (status === 'Closed' || newStatus !== 'Closed')}
         >
           Update Status
         </button>
@@ -110,6 +126,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         value={newComment}
         onChange={(e) => setNewComment(e.target.value)}
         placeholder="Write a comment..."
+        disabled={userRole === 'Employee' && status === 'Closed'} // Disable comment input if feedback is closed
       />
       <label className="inline-flex items-center mt-2">
         <input
@@ -117,12 +134,14 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           className="form-checkbox"
           checked={isAnonymous}
           onChange={(e) => setIsAnonymous(e.target.checked)}
+          disabled={userRole === 'Employee' && status === 'Closed'} // Disable if feedback is closed
         />
         <span className="ml-2">Submit as Anonymous</span>
       </label>
       <button
         onClick={submitComment}
         className="w-full bg-blue-500 text-white py-2 px-4 mt-4 rounded hover:bg-blue-600"
+        disabled={userRole === 'Employee' && status === 'Closed'} // Disable button if feedback is closed
       >
         Submit Comment
       </button>

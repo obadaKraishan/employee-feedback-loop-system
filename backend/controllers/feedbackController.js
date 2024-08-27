@@ -49,6 +49,7 @@ const submitFeedback = async (req, res) => {
 const updateFeedbackStatus = async (req, res) => {
   const { feedbackId } = req.params;
   const { status } = req.body;
+  const userInfo = req.employee;
 
   try {
     const feedback = await Feedback.findById(feedbackId);
@@ -57,6 +58,25 @@ const updateFeedbackStatus = async (req, res) => {
       return res.status(404).json({ message: 'Feedback not found' });
     }
 
+    // Attach the feedback to req object for further checks
+    req.feedback = feedback;
+
+    // Restrict employees to only change the status of their own feedback from "Open" to "Closed"
+    if (userInfo.role === 'Employee') {
+      if (feedback.employeeId.toString() !== userInfo._id.toString()) {
+        return res.status(403).json({ message: 'You can only update your own feedback' });
+      }
+
+      if (feedback.status === 'Closed') {
+        return res.status(403).json({ message: 'Feedback is already closed and cannot be reopened or changed' });
+      }
+
+      if (status !== 'Closed') {
+        return res.status(403).json({ message: 'You can only close your feedback' });
+      }
+    }
+
+    // Managers and CEOs can change the status to any value
     feedback.status = status;
     await feedback.save();
 
@@ -94,6 +114,11 @@ const addComment = async (req, res) => {
 
     if (!feedback) {
       return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    // If feedback is closed, deny adding comments
+    if (feedback.status === 'Closed' && userInfo.role === 'Employee') {
+      return res.status(403).json({ message: 'Cannot add comments to closed feedback' });
     }
 
     const newComment = {
