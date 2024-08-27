@@ -1,15 +1,11 @@
-// src/components/FeedbackDetail.js
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from './Sidebar';
-import Header from './Header';
-import Footer from './Footer';
 import FeedbackDiscussion from './FeedbackDiscussion'; 
 
 function FeedbackDetail() {
-  const { feedbackId } = useParams(); // Ensure feedbackId is a string
+  const { feedbackId } = useParams();
   const [feedback, setFeedback] = useState(null);
   const navigate = useNavigate();
 
@@ -56,7 +52,7 @@ function FeedbackDetail() {
           {feedback ? (
             <div className="bg-white p-6 rounded shadow-lg">
               <h2 className="text-xl font-bold mb-4">Feedback Details</h2>
-              <p><strong>Sender:</strong> {feedback.employeeId?.name || 'Anonymous'}</p>
+              <p><strong>Sender:</strong> {feedback.employeeId?.name || 'Anonymous'}</p> {/* Display only the name */}
               <p><strong>Message:</strong> {feedback.message}</p>
               <p><strong>Status:</strong> {feedback.status}</p>
               <p className="text-gray-500 text-sm mt-4">{new Date(feedback.date).toLocaleString()}</p>

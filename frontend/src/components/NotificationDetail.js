@@ -4,8 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from './Sidebar';
-import Header from './Header';
-import Footer from './Footer';
 
 function NotificationDetail() {
   const { notificationId } = useParams();
