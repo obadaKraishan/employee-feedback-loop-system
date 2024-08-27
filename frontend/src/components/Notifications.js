@@ -14,8 +14,8 @@ function Notifications() {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
-        setNotifications(data);
-        setUnreadCount(data.filter(notif => !notif.isRead).length);
+        setNotifications(data || []); // Ensure data is an array
+        setUnreadCount((data || []).filter(notif => !notif.isRead).length);
       } catch (error) {
         console.error('Failed to fetch notifications', error);
       }
@@ -49,15 +49,19 @@ function Notifications() {
         Unread Notifications: {unreadCount}
       </div>
       <ul className="space-y-2">
-        {notifications.map((notification) => (
-          <li
-            key={notification._id}
-            className={`p-2 rounded ${notification.isRead ? 'bg-gray-200' : 'bg-blue-100'}`}
-            onClick={() => markAsRead(notification._id)}
-          >
-            {notification.message}
-          </li>
-        ))}
+        {notifications.length > 0 ? (
+          notifications.map((notification) => (
+            <li
+              key={notification._id}
+              className={`p-2 rounded ${notification.isRead ? 'bg-gray-200' : 'bg-blue-100'}`}
+              onClick={() => markAsRead(notification._id)}
+            >
+              {notification.message}
+            </li>
+          ))
+        ) : (
+          <p>No notifications available.</p>
+        )}
       </ul>
     </div>
   );

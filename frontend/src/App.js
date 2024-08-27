@@ -26,6 +26,7 @@ function App() {
               <>
                 <Route path="/my-feedbacks" element={<MyFeedbacks />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/notifications" element={<NotificationsPage />} /> {/* Add this line */}
                 <Route path="*" element={<Navigate to="/my-feedbacks" />} />
               </>
             ) : (

@@ -20,12 +20,14 @@ const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');  // Correctly import notification routes
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/notifications', notificationRoutes);  // Ensure this line is correct
 
 app.get('/', (req, res) => {
   res.send('API is running...');
