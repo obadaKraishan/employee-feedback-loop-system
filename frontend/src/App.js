@@ -6,6 +6,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import AllEmployees from './pages/AllEmployees';
 import AllFeedbacks from './pages/AllFeedbacks';
+import NotificationsPage from './pages/Notifications';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Login from './pages/Login';
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/employees" element={<AllEmployees />} />
                 <Route path="/feedbacks" element={<AllFeedbacks />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             )}

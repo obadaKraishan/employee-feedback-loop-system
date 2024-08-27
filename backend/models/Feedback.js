@@ -11,7 +11,7 @@ const feedbackSchema = mongoose.Schema({
   },
   sentiment: {
     type: String,
-    enum: ['positive', 'negative', 'neutral'], // Define allowed values
+    enum: ['positive', 'negative', 'neutral'],
     default: 'neutral',
   },
   date: {
@@ -21,6 +21,11 @@ const feedbackSchema = mongoose.Schema({
   isAnonymous: {
     type: Boolean,
     default: false,
+  },
+  status: {  // Add the status field here
+    type: String,
+    enum: ['Open', 'Under Process', 'Closed'],
+    default: 'Open',
   },
   comments: [
     {

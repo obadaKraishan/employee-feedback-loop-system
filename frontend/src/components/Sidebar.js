@@ -36,6 +36,9 @@ function Sidebar() {
           </>
         )}
         <li className="p-4 hover:bg-gray-700">
+          <Link to="/notifications">Notifications</Link>
+        </li>
+        <li className="p-4 hover:bg-gray-700">
           <button onClick={logoutHandler} className="w-full text-left">
             Logout
           </button>

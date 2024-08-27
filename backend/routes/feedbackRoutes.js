@@ -1,9 +1,7 @@
-// backend/routes/feedbackRoutes.js
-
 const express = require('express');
-const { submitFeedback, getFeedback, getMyFeedbacks } = require('../controllers/feedbackController');
+const { submitFeedback, getFeedback, getMyFeedbacks, updateFeedbackStatus } = require('../controllers/feedbackController');
 const { protect, authorize } = require('../middleware/authMiddleware');
-const Feedback = require('../models/Feedback');
+const Feedback = require('../models/Feedback');  // Import the Feedback model
 
 const router = express.Router();
 
@@ -21,6 +19,11 @@ router.get('/', protect, authorize('CEO', 'Manager'), getFeedback);
 // @route   GET /api/feedback/mine
 // @access  Private (All Employees)
 router.get('/mine', protect, getMyFeedbacks);
+
+// @desc    Update feedback status
+// @route   PUT /api/feedback/:feedbackId/status
+// @access  Private (Manager, CEO)
+router.put('/:feedbackId/status', protect, authorize('Manager', 'CEO'), updateFeedbackStatus);
 
 // @desc    Add comment to feedback
 // @route   POST /api/feedback/:feedbackId/comment

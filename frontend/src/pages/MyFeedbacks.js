@@ -87,6 +87,15 @@ function MyFeedbacks() {
     }
   };
 
+  const handleStatusChange = (newStatus) => {
+    if (selectedFeedback) {
+      setSelectedFeedback({
+        ...selectedFeedback,
+        status: newStatus,
+      });
+    }
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -103,6 +112,7 @@ function MyFeedbacks() {
           <div key={feedback._id} className="mb-4 p-4 bg-gray-100 rounded shadow">
             <p>{feedback.message}</p>
             <p className="text-sm text-gray-600">Department: {feedback.department}</p>
+            <p className="text-sm text-gray-600">Status: {feedback.status}</p>
             <button
               onClick={() => setSelectedFeedback(selectedFeedback === feedback ? null : feedback)}
               className="text-blue-500 hover:underline mt-2"
@@ -113,7 +123,9 @@ function MyFeedbacks() {
               <FeedbackDiscussion
                 feedbackId={feedback._id}
                 comments={feedback.comments}
+                status={feedback.status}
                 onNewComment={handleCommentAdded}
+                onStatusChange={handleStatusChange}
               />
             )}
           </div>

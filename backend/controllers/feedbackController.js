@@ -6,7 +6,7 @@ const { analyzeSentiment } = require('../services/sentimentAnalysisService');
 // @access  Private
 const submitFeedback = async (req, res) => {
   const { message, department, isAnonymous } = req.body;
-  const employeeId = req.employee._id; // Assuming you attach employee info to req.employee in the middleware
+  const employeeId = req.employee._id;
 
   try {
     const sentiment = analyzeSentiment(message);
@@ -17,12 +17,36 @@ const submitFeedback = async (req, res) => {
       department,
       sentiment,
       isAnonymous,
+      status: 'Open', // Default status when feedback is created
       date: new Date(),
     });
 
     res.status(201).json(feedback);
   } catch (error) {
     res.status(400).json({ message: 'Failed to submit feedback', error: error.message });
+  }
+};
+
+// @desc    Update feedback status
+// @route   PUT /api/feedback/:feedbackId/status
+// @access  Private
+const updateFeedbackStatus = async (req, res) => {
+  const { feedbackId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const feedback = await Feedback.findById(feedbackId);
+
+    if (!feedback) {
+      return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    feedback.status = status;
+    await feedback.save();
+
+    res.status(200).json({ status: feedback.status });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update status', error: error.message });
   }
 };
 
@@ -34,13 +58,10 @@ const getFeedback = async (req, res) => {
     let feedback;
 
     if (req.employee.role === 'CEO') {
-      // CEO can see all feedbacks
       feedback = await Feedback.find({});
     } else if (req.employee.role === 'Manager') {
-      // Managers can see feedbacks from their department only
       feedback = await Feedback.find({ department: req.employee.department });
     } else {
-      // Regular employees should not have access to this route; alternatively, you can implement logic to restrict or customize the feedback they see.
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -64,6 +85,7 @@ const getMyFeedbacks = async (req, res) => {
 
 module.exports = {
   submitFeedback,
+  updateFeedbackStatus,  // Export the new function
   getFeedback,
   getMyFeedbacks,
 };

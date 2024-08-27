@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
-function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
+function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStatusChange }) {
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [newStatus, setNewStatus] = useState(status);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('');
-
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => setShowToast(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showToast]);
 
   const submitComment = async () => {
     try {
@@ -32,7 +26,9 @@ function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
       );
       setNewComment('');
       setIsAnonymous(false);
-      onNewComment(data); // Update the parent component with the new comment
+      if (typeof onNewComment === 'function') {
+        onNewComment(data); // Add the new comment to the state to update the UI
+      }
 
       // Show success toast
       setToastType('success');
@@ -47,9 +43,56 @@ function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
     }
   };
 
+  const updateStatus = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const { data } = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+      );
+      if (typeof onStatusChange === 'function') {
+        onStatusChange(data.status); // Update status if the function is passed correctly
+      }
+
+      // Show success toast
+      setToastType('success');
+      setToastMessage('Status updated successfully');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Failed to update status', error);
+      // Show error toast
+      setToastType('error');
+      setToastMessage('Failed to update status. Please try again.');
+      setShowToast(true);
+    }
+  };
+
   return (
     <div className="p-4 bg-gray-100 rounded">
       <h2 className="text-xl font-bold">Discussion</h2>
+      <div className="mb-4">
+        <label className="font-semibold">Status:</label>
+        <select
+          className="ml-2 p-2 border border-gray-300 rounded"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        >
+          <option value="Open">Open</option>
+          <option value="Under Process">Under Process</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <button
+          onClick={updateStatus}
+          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Update Status
+        </button>
+      </div>
       {comments.length > 0 ? (
         <ul className="space-y-2">
           {comments.map((comment, index) => (
