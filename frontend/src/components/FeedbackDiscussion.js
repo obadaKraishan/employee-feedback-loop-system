@@ -11,14 +11,22 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
+    console.log('Component Mounted/Updated: FeedbackDiscussion');
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (userInfo && userInfo.role) {
       setUserRole(userInfo.role);
     }
-  }, []);
+    console.log('User Role:', userRole);
+  }, [userRole]);
+
+  useEffect(() => {
+    console.log('Status prop changed:', status);
+    setNewStatus(status); // Update local status state if props change
+  }, [status]);
 
   const submitComment = async () => {
     try {
+      console.log('Submitting comment:', newComment);
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}/comment`,
@@ -32,6 +40,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           },
         }
       );
+      console.log('Comment submitted:', data);
       setNewComment('');
       setIsAnonymous(false);
       if (typeof onNewComment === 'function') {
@@ -53,6 +62,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
 
   const updateStatus = async () => {
     try {
+      console.log('Updating status to:', newStatus);
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
       const { data } = await axios.put(
         `${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}/status`,
@@ -63,6 +73,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           },
         }
       );
+      console.log('Status updated:', data.status);
       if (typeof onStatusChange === 'function') {
         onStatusChange(data.status); // Update status if the function is passed correctly
       }
@@ -80,6 +91,14 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
     }
   };
 
+  useEffect(() => {
+    if (showToast) {
+      console.log('Showing toast:', toastMessage);
+      const timer = setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
   return (
     <div className="p-4 bg-gray-100 rounded">
       <h2 className="text-xl font-bold">Discussion</h2>
@@ -89,7 +108,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           className="ml-2 p-2 border border-gray-300 rounded"
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
-          disabled={userRole === 'Employee' && status === 'Closed'} // Disable for employees if feedback is closed
+          disabled={userRole === 'Employee' && status === 'Closed'}
         >
           <option value="Open" disabled={userRole === 'Employee' && status !== 'Open'}>
             Open
@@ -113,7 +132,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         <ul className="space-y-2">
           {comments.map((comment, index) => (
             <li key={index} className="p-2 bg-white shadow rounded">
-              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter?.name || 'Unknown'}:</strong> {/* Safely access `name` */}
+              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter?.name || 'Unknown'}</strong> {/* Safely access `name` */}
               {comment.commentText}
               <div className="text-sm text-gray-600">{new Date(comment.timestamp).toLocaleString()}</div>
             </li>
@@ -127,7 +146,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         value={newComment}
         onChange={(e) => setNewComment(e.target.value)}
         placeholder="Write a comment..."
-        disabled={userRole === 'Employee' && status === 'Closed'} // Disable comment input if feedback is closed
+        disabled={userRole === 'Employee' && status === 'Closed'}
       />
       <label className="inline-flex items-center mt-2">
         <input
@@ -135,21 +154,21 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
           className="form-checkbox"
           checked={isAnonymous}
           onChange={(e) => setIsAnonymous(e.target.checked)}
-          disabled={userRole === 'Employee' && status === 'Closed'} // Disable if feedback is closed
+          disabled={userRole === 'Employee' && status === 'Closed'}
         />
         <span className="ml-2">Submit as Anonymous</span>
       </label>
       <button
         onClick={submitComment}
         className="w-full bg-blue-500 text-white py-2 px-4 mt-4 rounded hover:bg-blue-600"
-        disabled={userRole === 'Employee' && status === 'Closed'} // Disable button if feedback is closed
+        disabled={userRole === 'Employee' && status === 'Closed'}
       >
         Submit Comment
       </button>
 
-      {/* Toast Notification */}
+      {/* Custom Toast Notification */}
       {showToast && (
-        <div className={`fixed bottom-4 right-4 p-4 rounded shadow-lg ${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+        <div className={`toast-notification ${toastType}`}>
           {toastMessage}
         </div>
       )}

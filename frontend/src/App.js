@@ -1,7 +1,5 @@
-// src/App.js
-
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import Navigate
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import MyFeedbacks from './pages/MyFeedbacks';
 import Profile from './pages/Profile';
@@ -14,6 +12,9 @@ import FeedbackDetail from './components/FeedbackDetail';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Login from './pages/Login';
+
+// Import custom CSS
+import './App.css';
 
 function App() {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));

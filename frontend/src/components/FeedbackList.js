@@ -5,10 +5,23 @@ function FeedbackList({ feedbacks }) {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
 
   const handleCommentAdded = (newComment) => {
-    setSelectedFeedback({
-      ...selectedFeedback,
-      comments: [...selectedFeedback.comments, newComment],
-    });
+    console.log('New comment added:', newComment);
+    if (selectedFeedback) {
+      setSelectedFeedback((prevFeedback) => ({
+        ...prevFeedback,
+        comments: [...prevFeedback.comments, newComment],
+      }));
+    }
+  };
+
+  const handleStatusChange = (newStatus) => {
+    console.log('Status changed to:', newStatus);
+    if (selectedFeedback) {
+      setSelectedFeedback((prevFeedback) => ({
+        ...prevFeedback,
+        status: newStatus,
+      }));
+    }
   };
 
   const getStatusColor = (status) => {
@@ -45,7 +58,10 @@ function FeedbackList({ feedbacks }) {
                 </span>
               </div>
               <button
-                onClick={() => setSelectedFeedback(selectedFeedback === feedback ? null : feedback)}
+                onClick={() => {
+                  console.log('Selected feedback:', feedback);
+                  setSelectedFeedback(selectedFeedback === feedback ? null : feedback);
+                }}
                 className="text-blue-500 hover:underline mt-2"
               >
                 {selectedFeedback === feedback ? 'Hide Comments' : 'Show Comments'}
@@ -54,10 +70,10 @@ function FeedbackList({ feedbacks }) {
               {selectedFeedback === feedback && (
                 <FeedbackDiscussion
                   feedbackId={feedback._id}
-                  comments={feedback.comments}
-                  status={feedback.status}
+                  comments={selectedFeedback.comments}
+                  status={selectedFeedback.status}
                   onNewComment={handleCommentAdded}
-                  onStatusChange={(newStatus) => setSelectedFeedback({ ...selectedFeedback, status: newStatus })}
+                  onStatusChange={handleStatusChange}
                 />
               )}
             </li>
