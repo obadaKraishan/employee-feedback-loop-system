@@ -1,11 +1,19 @@
-// src/components/FeedbackDiscussion.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('');
+
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   const submitComment = async () => {
     try {
@@ -24,9 +32,18 @@ function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
       );
       setNewComment('');
       setIsAnonymous(false);
-      onNewComment(data); // Trigger callback to refresh the comments list
+      onNewComment(data); // Update the parent component with the new comment
+
+      // Show success toast
+      setToastType('success');
+      setToastMessage('Comment added successfully');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to submit comment', error);
+      // Show error toast
+      setToastType('error');
+      setToastMessage('Failed to add comment. Please try again.');
+      setShowToast(true);
     }
   };
 
@@ -66,6 +83,13 @@ function FeedbackDiscussion({ feedbackId, comments, onNewComment }) {
       >
         Submit Comment
       </button>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`fixed bottom-4 right-4 p-4 rounded shadow-lg ${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }
