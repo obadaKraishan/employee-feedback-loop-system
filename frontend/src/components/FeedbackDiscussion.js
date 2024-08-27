@@ -11,17 +11,18 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    console.log('Component Mounted/Updated: FeedbackDiscussion');
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (userInfo && userInfo.role) {
       setUserRole(userInfo.role);
     }
     console.log('User Role:', userRole);
-  }, [userRole]);
+  }, []);
 
   useEffect(() => {
+    if (status !== newStatus) {
+      setNewStatus(status);
+    }
     console.log('Status prop changed:', status);
-    setNewStatus(status); // Update local status state if props change
   }, [status]);
 
   const submitComment = async () => {
@@ -44,16 +45,14 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
       setNewComment('');
       setIsAnonymous(false);
       if (typeof onNewComment === 'function') {
-        onNewComment(data); // Add the new comment to the state to update the UI
+        onNewComment(data); 
       }
 
-      // Show success toast
       setToastType('success');
       setToastMessage('Comment added successfully');
       setShowToast(true);
     } catch (error) {
       console.error('Failed to submit comment', error);
-      // Show error toast
       setToastType('error');
       setToastMessage('Failed to add comment. Please try again.');
       setShowToast(true);
@@ -75,16 +74,14 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
       );
       console.log('Status updated:', data.status);
       if (typeof onStatusChange === 'function') {
-        onStatusChange(data.status); // Update status if the function is passed correctly
+        onStatusChange(data.status);
       }
 
-      // Show success toast
       setToastType('success');
       setToastMessage('Status updated successfully');
       setShowToast(true);
     } catch (error) {
       console.error('Failed to update status', error);
-      // Show error toast
       setToastType('error');
       setToastMessage('Failed to update status. Please try again.');
       setShowToast(true);
@@ -94,10 +91,10 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
   useEffect(() => {
     if (showToast) {
       console.log('Showing toast:', toastMessage);
-      const timer = setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+      const timer = setTimeout(() => setShowToast(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [showToast]);
+  }, [showToast, toastMessage]);
 
   return (
     <div className="p-4 bg-gray-100 rounded">
@@ -132,7 +129,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         <ul className="space-y-2">
           {comments.map((comment, index) => (
             <li key={index} className="p-2 bg-white shadow rounded">
-              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter?.name || 'Unknown'}</strong> {/* Safely access `name` */}
+              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter?.name || 'Unknown'}</strong>
               {comment.commentText}
               <div className="text-sm text-gray-600">{new Date(comment.timestamp).toLocaleString()}</div>
             </li>
@@ -166,7 +163,6 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         Submit Comment
       </button>
 
-      {/* Custom Toast Notification */}
       {showToast && (
         <div className={`toast-notification ${toastType}`}>
           {toastMessage}

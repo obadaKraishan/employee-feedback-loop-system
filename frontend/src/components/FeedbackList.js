@@ -60,14 +60,16 @@ function FeedbackList({ feedbacks }) {
               <button
                 onClick={() => {
                   console.log('Selected feedback:', feedback);
-                  setSelectedFeedback(selectedFeedback === feedback ? null : feedback);
+                  setSelectedFeedback((prevSelected) =>
+                    prevSelected && prevSelected._id === feedback._id ? null : feedback
+                  );
                 }}
                 className="text-blue-500 hover:underline mt-2"
               >
-                {selectedFeedback === feedback ? 'Hide Comments' : 'Show Comments'}
+                {selectedFeedback && selectedFeedback._id === feedback._id ? 'Hide Comments' : 'Show Comments'}
               </button>
 
-              {selectedFeedback === feedback && (
+              {selectedFeedback && selectedFeedback._id === feedback._id && (
                 <FeedbackDiscussion
                   feedbackId={feedback._id}
                   comments={selectedFeedback.comments}
