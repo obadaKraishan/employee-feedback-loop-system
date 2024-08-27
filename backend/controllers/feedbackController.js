@@ -1,6 +1,9 @@
+// controllers/feedbackController.js
+
 const Notification = require('../models/Notification');
 const Feedback = require('../models/Feedback');
 const { analyzeSentiment } = require('../services/sentimentAnalysisService');
+const mongoose = require('mongoose');
 
 // @desc    Submit feedback
 // @route   POST /api/feedback
@@ -122,7 +125,7 @@ const addComment = async (req, res) => {
     }
 
     const newComment = {
-      commenter: userInfo.role,
+      commenter: userInfo._id, // Use user ID to reference the commenter
       commentText,
       isAnonymous,
       timestamp: new Date(),
@@ -194,10 +197,38 @@ const getMyFeedbacks = async (req, res) => {
   }
 };
 
+// @desc    Get feedback by ID
+// @route   GET /api/feedback/:feedbackId
+// @access  Private
+const getFeedbackById = async (req, res) => {
+  try {
+    const { feedbackId } = req.params;
+
+    // Validate the ObjectId
+    if (!mongoose.Types.ObjectId.isValid(feedbackId)) {
+      return res.status(400).json({ message: 'Invalid feedback ID' });
+    }
+
+    const feedback = await Feedback.findById(feedbackId)
+      .populate('employeeId', 'name email') // Populate employee details if needed
+      .populate('comments.commenter', 'name'); // Populate commenter details if needed
+
+    if (!feedback) {
+      return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    res.status(200).json(feedback);
+  } catch (error) {
+    console.error('Error fetching feedback:', error);
+    res.status(500).json({ message: 'Failed to fetch feedback', error: error.message });
+  }
+};
+
 module.exports = {
   submitFeedback,
   updateFeedbackStatus,
   addComment,
   getFeedback,
   getMyFeedbacks,
+  getFeedbackById,  // New export for getting feedback details by ID
 };

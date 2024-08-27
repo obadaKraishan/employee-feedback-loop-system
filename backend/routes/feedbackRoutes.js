@@ -1,3 +1,5 @@
+// routes/feedbackRoutes.js
+
 const express = require('express');
 const {
   submitFeedback,
@@ -5,6 +7,7 @@ const {
   getMyFeedbacks,
   updateFeedbackStatus,
   addComment,
+  getFeedbackById,
 } = require('../controllers/feedbackController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -24,6 +27,11 @@ router.get('/', protect, authorize('CEO', 'Manager'), getFeedback);
 // @route   GET /api/feedback/mine
 // @access  Private (All Employees)
 router.get('/mine', protect, getMyFeedbacks);
+
+// @desc    Get feedback by ID
+// @route   GET /api/feedback/:feedbackId
+// @access  Private (All Employees)
+router.get('/:feedbackId', protect, getFeedbackById); // New route for feedback details
 
 // @desc    Update feedback status
 // @route   PUT /api/feedback/:feedbackId/status

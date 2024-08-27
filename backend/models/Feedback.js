@@ -1,8 +1,11 @@
+// models/Feedback.js
+
 const mongoose = require('mongoose');
 
 const feedbackSchema = mongoose.Schema({
   employeeId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee', // Reference the Employee model
     required: true,
   },
   message: {
@@ -22,7 +25,7 @@ const feedbackSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  status: {  // Add the status field here
+  status: {  
     type: String,
     enum: ['Open', 'Under Process', 'Closed'],
     default: 'Open',
@@ -30,7 +33,8 @@ const feedbackSchema = mongoose.Schema({
   comments: [
     {
       commenter: {
-        type: String, // Can be 'Manager', 'Employee', or 'CEO'
+        type: mongoose.Schema.Types.ObjectId, // Reference the Employee model for commenter
+        ref: 'Employee',
         required: true,
       },
       commentText: {
