@@ -172,9 +172,11 @@ const getFeedback = async (req, res) => {
     let feedback;
 
     if (req.employee.role === 'CEO') {
-      feedback = await Feedback.find({});
+      feedback = await Feedback.find({})
+        .populate('employeeId', 'name'); // Populate employeeId with name
     } else if (req.employee.role === 'Manager') {
-      feedback = await Feedback.find({ department: req.employee.department });
+      feedback = await Feedback.find({ department: req.employee.department })
+        .populate('employeeId', 'name'); // Populate employeeId with name
     } else {
       return res.status(403).json({ message: 'Access denied' });
     }

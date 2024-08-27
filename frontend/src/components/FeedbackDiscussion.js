@@ -113,7 +113,7 @@ function FeedbackDiscussion({ feedbackId, comments, status, onNewComment, onStat
         <ul className="space-y-2">
           {comments.map((comment, index) => (
             <li key={index} className="p-2 bg-white shadow rounded">
-              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter.name}:</strong> {/* Adjusted to access `name` */}
+              <strong>{comment.isAnonymous ? 'Anonymous' : comment.commenter?.name || 'Unknown'}:</strong> {/* Safely access `name` */}
               {comment.commentText}
               <div className="text-sm text-gray-600">{new Date(comment.timestamp).toLocaleString()}</div>
             </li>

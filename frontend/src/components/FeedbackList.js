@@ -33,7 +33,8 @@ function FeedbackList({ feedbacks }) {
             <li key={feedback._id} className="p-4 bg-gray-100 rounded shadow">
               <div className="flex justify-between items-center">
                 <div>
-                  <strong>{feedback.isAnonymous ? 'Anonymous' : feedback.employeeId}</strong>: {feedback.message}
+                  <strong>{feedback.isAnonymous ? 'Anonymous' : feedback.employeeId?.name || 'Unknown'}</strong>: {/* Safely access name */}
+                  {feedback.message}
                   <div className="text-sm text-gray-600">Sentiment: {feedback.sentiment}</div>
                 </div>
                 <span
