@@ -22,6 +22,26 @@ const feedbackSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  comments: [
+    {
+      commenter: {
+        type: String, // Can be 'Manager', 'Employee', or 'CEO'
+        required: true,
+      },
+      commentText: {
+        type: String,
+        required: true,
+      },
+      isAnonymous: {
+        type: Boolean,
+        default: false,
+      },
+      timestamp: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 }, {
   timestamps: true,
 });

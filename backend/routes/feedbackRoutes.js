@@ -1,6 +1,9 @@
+// backend/routes/feedbackRoutes.js
+
 const express = require('express');
 const { submitFeedback, getFeedback, getMyFeedbacks } = require('../controllers/feedbackController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const Feedback = require('../models/Feedback');
 
 const router = express.Router();
 
@@ -18,5 +21,37 @@ router.get('/', protect, authorize('CEO', 'Manager'), getFeedback);
 // @route   GET /api/feedback/mine
 // @access  Private (All Employees)
 router.get('/mine', protect, getMyFeedbacks);
+
+// @desc    Add comment to feedback
+// @route   POST /api/feedback/:feedbackId/comment
+// @access  Private (All Employees)
+router.post('/:feedbackId/comment', protect, async (req, res) => {
+    try {
+        const { feedbackId } = req.params;
+        const { commentText, isAnonymous } = req.body;
+        const userInfo = req.employee;
+
+        const feedback = await Feedback.findById(feedbackId);
+
+        if (!feedback) {
+            return res.status(404).json({ message: 'Feedback not found' });
+        }
+
+        const newComment = {
+            commenter: userInfo.role,
+            commentText,
+            isAnonymous,
+            timestamp: new Date(),
+        };
+
+        feedback.comments.push(newComment);
+        await feedback.save();
+
+        res.status(201).json(newComment);
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ message: 'Failed to add comment', error: error.message });
+    }
+});
 
 module.exports = router;
