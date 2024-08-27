@@ -16,7 +16,9 @@ function FeedbackDetail() {
   useEffect(() => {
     const fetchFeedbackDetail = async () => {
       try {
+        console.log('Fetching user info from localStorage');
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        console.log('User info:', userInfo);
 
         if (!userInfo || !userInfo.token) {
           console.error('User not authenticated, redirecting to login.');
@@ -24,11 +26,13 @@ function FeedbackDetail() {
           return;
         }
 
+        console.log('Fetching feedback details from API with feedback ID:', feedbackId);
         const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
+        console.log('Fetched feedback details:', data);
         setFeedback(data);
       } catch (error) {
         console.error('Failed to fetch feedback details', error);
@@ -43,7 +47,6 @@ function FeedbackDetail() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <div className="flex flex-grow">
         <Sidebar />
         <div className="flex-grow p-4">
@@ -71,7 +74,6 @@ function FeedbackDetail() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

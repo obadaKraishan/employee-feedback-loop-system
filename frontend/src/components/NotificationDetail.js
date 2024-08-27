@@ -15,18 +15,23 @@ function NotificationDetail() {
   useEffect(() => {
     const fetchNotificationDetail = async () => {
       try {
+        console.log('Fetching user info from localStorage');
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        console.log('User info:', userInfo);
+
         if (!userInfo || !userInfo.token) {
           console.error('User not authenticated, redirecting to login.');
           navigate('/login'); // Redirect to login if user is not authenticated
           return;
         }
-        
+
+        console.log('Fetching notification details from API with ID:', notificationId);
         const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/notifications/${notificationId}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
+        console.log('Fetched notification details:', data);
         setNotification(data);
       } catch (error) {
         console.error('Failed to fetch notification details', error);
@@ -41,13 +46,14 @@ function NotificationDetail() {
 
   const handleViewFeedback = () => {
     if (notification && notification.relatedFeedback) {
-      navigate(`/feedbacks/${notification.relatedFeedback}`); // Ensure relatedFeedback is a valid string
+      const feedbackId = notification.relatedFeedback._id; // Extract the ID from the relatedFeedback object
+      console.log('Navigating to feedback details with ID:', feedbackId);
+      navigate(`/feedbacks/${feedbackId}`); // Use the ID string for navigation
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <div className="flex flex-grow">
         <Sidebar />
         <div className="flex-grow p-4">
@@ -69,7 +75,6 @@ function NotificationDetail() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
