@@ -36,17 +36,17 @@ const botEntities = [
 ];
 
 const botResponses = [
-  { responseText: "I am feeling great!", action: "suggest_feedback", intent: "CheckIn" },
-  { responseText: "I am a bit stressed.", action: "suggest_help", intent: "CheckIn" },
-  { responseText: "I need help with something.", action: "request_assistance", intent: "RequestHelp" },
-  { responseText: "Not right now, thanks.", action: "end_conversation", intent: "CheckIn" },
-  { responseText: "I am facing a technical issue.", action: "log_issue", intent: "ReportIssue" },
-  { responseText: "I appreciate the support from my team.", action: "log_positive_feedback", intent: "ExpressGratitude" },
-  { responseText: "Can you clarify the task details?", action: "provide_clarification", intent: "AskForClarification" },
-  { responseText: "I have a suggestion to improve our process.", action: "log_suggestion", intent: "SuggestImprovement" },
-  { responseText: "Just wanted to have a quick chat.", action: "social_chat", intent: "SocialChat" },
-  { responseText: "I am frustrated with the current workload.", action: "suggest_help", intent: "ReportIssue" },
-  { responseText: "The leadership has been excellent.", action: "log_positive_feedback", intent: "ExpressGratitude" },
+  { responseText: "I am feeling great!", action: "suggest_feedback", intent: "CheckIn", followUpQuestionIndex: 1 },
+  { responseText: "I am a bit stressed.", action: "suggest_help", intent: "CheckIn", followUpQuestionIndex: 2 },
+  { responseText: "I need help with something.", action: "request_assistance", intent: "RequestHelp", followUpQuestionIndex: 3 },
+  { responseText: "Not right now, thanks.", action: "end_conversation", intent: "CheckIn", followUpQuestionIndex: null },
+  { responseText: "I am facing a technical issue.", action: "log_issue", intent: "ReportIssue", followUpQuestionIndex: 4 },
+  { responseText: "I appreciate the support from my team.", action: "log_positive_feedback", intent: "ExpressGratitude", followUpQuestionIndex: 5 },
+  { responseText: "Can you clarify the task details?", action: "provide_clarification", intent: "AskForClarification", followUpQuestionIndex: 6 },
+  { responseText: "I have a suggestion to improve our process.", action: "log_suggestion", intent: "SuggestImprovement", followUpQuestionIndex: 6 },
+  { responseText: "Just wanted to have a quick chat.", action: "social_chat", intent: "SocialChat", followUpQuestionIndex: 1 },
+  { responseText: "I am frustrated with the current workload.", action: "suggest_help", intent: "ReportIssue", followUpQuestionIndex: 2 },
+  { responseText: "The leadership has been excellent.", action: "log_positive_feedback", intent: "ExpressGratitude", followUpQuestionIndex: 3 },
 ];
 
 const botQuestions = [
@@ -73,11 +73,21 @@ const importBotData = async () => {
       const createdEntities = await BotEntity.insertMany(botEntities);
       console.log("Bot entities seeded");
 
+      const createdQuestions = await BotQuestion.insertMany(botQuestions);
+      console.log("Bot questions seeded");
+
       const createdResponses = await BotResponse.insertMany(
-          botResponses.map((response) => ({
-              ...response,
-              intent: createdIntents.find((intent) => intent.name === response.intent)._id,
-          }))
+          botResponses.map((response) => {
+              let followUpQuestion = null;
+              if (response.followUpQuestionIndex !== null) {
+                  followUpQuestion = createdQuestions[response.followUpQuestionIndex]._id;
+              }
+              return {
+                  ...response,
+                  intent: createdIntents.find((intent) => intent.name === response.intent)._id,
+                  followUpQuestion: followUpQuestion,
+              };
+          })
       );
       console.log("Bot responses seeded");
 
@@ -104,8 +114,14 @@ const importBotData = async () => {
           ["RequestHelp", "CheckIn"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
       ).map((response) => response._id);
 
-      await BotQuestion.insertMany(botQuestions);
-      console.log("Bot questions seeded");
+      // Update each question with their respective possible responses
+      for (let question of botQuestions) {
+          await BotQuestion.findByIdAndUpdate(
+              createdQuestions[botQuestions.indexOf(question)]._id,
+              { possibleResponses: question.possibleResponses },
+              { new: true }
+          );
+      }
 
       console.log("Bot data imported successfully!");
       process.exit();
