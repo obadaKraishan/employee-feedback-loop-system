@@ -40,9 +40,11 @@ const BotInteraction = () => {
     const handleResponse = async (responseId, responseText) => {
         try {
             const token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : null;
-
+    
+            // Add user's response to the chat history
             setChatHistory((prev) => [...prev, { text: responseText, sender: 'user' }]);
-
+    
+            // Make the API call to get the next question
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/bot/respond`,
                 {
@@ -56,20 +58,22 @@ const BotInteraction = () => {
                     },
                 }
             );
-
-            console.log('Received follow-up question:', response.data.question);
+    
+            // Check if there is a follow-up question
             if (response.data.question) {
-                animateText(response.data.question.questionText);
+                // Add bot's follow-up question to the chat history
+                setChatHistory((prev) => [...prev, { text: response.data.question.questionText, sender: 'bot' }]);
                 setQuestion(response.data.question);
             } else {
-                setQuestion(null);
+                // If no follow-up question, end the conversation
                 setChatHistory((prev) => [...prev, { text: "Conversation ended.", sender: 'bot' }]);
+                setQuestion(null);
             }
-
         } catch (error) {
             console.error('Error handling response:', error);
         }
     };
+    
 
     const animateText = (text) => {
         let index = 0;
