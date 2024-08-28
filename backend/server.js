@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -21,7 +22,7 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const botRoutes = require('./routes/botRoutes');  // Add bot routes
+const botRoutes = require('./routes/botRoutes');  // Import the bot routes
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -29,7 +30,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/bot', botRoutes);  // Add bot routes
+app.use('/api/bot', botRoutes);  // Use bot routes
 
 app.get('/', (req, res) => {
   res.send('API is running...');
