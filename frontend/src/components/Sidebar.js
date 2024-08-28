@@ -33,6 +33,7 @@ function Sidebar() {
           <>
             <li className="p-4 hover:bg-gray-700"><Link to="/my-feedbacks">My Feedback</Link></li>
             <li className="p-4 hover:bg-gray-700"><Link to="/profile">My Profile</Link></li>
+            <li className="p-4 hover:bg-gray-700"><Link to="/bot-interaction">Bot Interaction</Link></li> {/* New Bot Interaction Link */}
           </>
         )}
         <li className="p-4 hover:bg-gray-700">

@@ -7,13 +7,13 @@ import Dashboard from './pages/Dashboard';
 import AllEmployees from './pages/AllEmployees';
 import AllFeedbacks from './pages/AllFeedbacks';
 import NotificationsPage from './pages/Notifications';
-import NotificationDetail from './components/NotificationDetail'; 
+import NotificationDetail from './components/NotificationDetail';
 import FeedbackDetail from './components/FeedbackDetail';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Login from './pages/Login';
+import BotInteractionPage from './pages/BotInteractionPage'; // Import the new BotInteractionPage
 
-// Import custom CSS
 import './App.css';
 
 function App() {
@@ -36,6 +36,7 @@ function App() {
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/notifications/:notificationId" element={<NotificationDetail />} />
                     <Route path="/feedbacks/:feedbackId" element={<FeedbackDetail />} />
+                    <Route path="/bot-interaction" element={<BotInteractionPage />} /> {/* Add the BotInteractionPage */}
                     <Route path="*" element={<Navigate to="/my-feedbacks" replace />} />
                   </>
                 ) : (

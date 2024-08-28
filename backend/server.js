@@ -20,14 +20,16 @@ const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');  // Correctly import notification routes
+const notificationRoutes = require('./routes/notificationRoutes');
+const botRoutes = require('./routes/botRoutes');  // Add bot routes
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/feedback', feedbackRoutes);
-app.use('/api/notifications', notificationRoutes);  // Ensure this line is correct
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/bot', botRoutes);  // Add bot routes
 
 app.get('/', (req, res) => {
   res.send('API is running...');
