@@ -37,7 +37,7 @@ const importBotData = async () => {
         const createdResponses = await BotResponse.insertMany(
             botResponses.map((response) => {
                 let followUpQuestion = null;
-                if (response.followUpQuestionIndex !== null && response.followUpQuestionIndex < createdQuestions.length) {
+                if (typeof response.followUpQuestionIndex === 'number' && response.followUpQuestionIndex < createdQuestions.length) {
                     followUpQuestion = createdQuestions[response.followUpQuestionIndex]._id;
                 }
                 return {
@@ -49,19 +49,14 @@ const importBotData = async () => {
         );
         console.log("Bot responses seeded");
 
-        // Assign responses to questions
-        const assignResponsesToQuestions = (intentNames) => {
-            const possibleResponses = createdResponses.filter((response) =>
-                intentNames.includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-            ).map((response) => response._id);
-            return possibleResponses;
-        };
-
+        // Assign responses to their respective questions
         for (let i = 0; i < createdQuestions.length; i++) {
             const question = createdQuestions[i];
-            let possibleResponses = assignResponsesToQuestions(botIntents.map(intent => intent.name));
+            const possibleResponses = createdResponses
+                .filter(response => response.followUpQuestion === null || response.followUpQuestion.equals(question._id))
+                .map(response => response._id);
 
-            if (!possibleResponses || possibleResponses.length === 0) {
+            if (possibleResponses.length === 0) {
                 console.warn(`Warning: Question "${question.questionText}" has no possible responses assigned.`);
             } else {
                 await BotQuestion.findByIdAndUpdate(
@@ -76,7 +71,7 @@ const importBotData = async () => {
         console.log("Bot data imported successfully!");
         process.exit();
     } catch (error) {
-        console.error(`Error: ${error.message}`);
+        console.error(`Error during bot data import: ${error.message}`, error);
         process.exit(1);
     }
 };
