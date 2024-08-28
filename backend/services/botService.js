@@ -35,11 +35,16 @@ const handleResponse = async (conversationId, questionId, responseId) => {
   let followUpQuestion = response.followUpQuestion;
 
   if (!followUpQuestion) {
-      console.log('No follow-up question linked, but keeping the conversation active.');
-      return null; // Return null to indicate no new question but keep chat active
+      console.log('No follow-up question linked. Ending conversation.');
+      return null; // No follow-up question, end conversation
   } else {
       followUpQuestion = await BotQuestion.findById(followUpQuestion._id).populate('possibleResponses');
       console.log('Next follow-up question:', followUpQuestion);
+
+      if (!followUpQuestion.possibleResponses || followUpQuestion.possibleResponses.length === 0) {
+          console.log('Follow-up question has no possible responses. Ending conversation.');
+          return null; // No responses for follow-up question, end conversation
+      }
   }
 
   return followUpQuestion;

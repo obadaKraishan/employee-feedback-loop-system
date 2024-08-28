@@ -15,75 +15,70 @@ const botQuestions = require('./botData/questions');
 const botResponses = require('./botData/responses');
 
 const importBotData = async () => {
-  try {
-      await BotQuestion.deleteMany();
-      await BotResponse.deleteMany();
-      await BotIntent.deleteMany();
-      await BotEntity.deleteMany();
-      console.log("Existing bot data removed");
+    try {
+        // Clear existing data
+        await BotQuestion.deleteMany();
+        await BotResponse.deleteMany();
+        await BotIntent.deleteMany();
+        await BotEntity.deleteMany();
+        console.log("Existing bot data removed");
 
-      const createdIntents = await BotIntent.insertMany(botIntents);
-      console.log("Bot intents seeded");
+        // Seed intents, entities, and questions
+        const createdIntents = await BotIntent.insertMany(botIntents);
+        console.log("Bot intents seeded");
 
-      const createdEntities = await BotEntity.insertMany(botEntities);
-      console.log("Bot entities seeded");
+        const createdEntities = await BotEntity.insertMany(botEntities);
+        console.log("Bot entities seeded");
 
-      const createdQuestions = await BotQuestion.insertMany(botQuestions);
-      console.log("Bot questions seeded");
+        const createdQuestions = await BotQuestion.insertMany(botQuestions);
+        console.log("Bot questions seeded");
 
-      const createdResponses = await BotResponse.insertMany(
-          botResponses.map((response) => {
-              let followUpQuestion = null;
-              if (response.followUpQuestionIndex !== null) {
-                  followUpQuestion = createdQuestions[response.followUpQuestionIndex]._id;
-              }
-              return {
-                  ...response,
-                  intent: createdIntents.find((intent) => intent.name === response.intent)._id,
-                  followUpQuestion: followUpQuestion,
-              };
-          })
-      );
-      console.log("Bot responses seeded");
+        // Seed responses with follow-up questions and intent references
+        const createdResponses = await BotResponse.insertMany(
+            botResponses.map((response) => {
+                let followUpQuestion = null;
+                if (response.followUpQuestionIndex !== null && response.followUpQuestionIndex < createdQuestions.length) {
+                    followUpQuestion = createdQuestions[response.followUpQuestionIndex]._id;
+                }
+                return {
+                    ...response,
+                    intent: createdIntents.find((intent) => intent.name === response.intent)._id,
+                    followUpQuestion: followUpQuestion,
+                };
+            })
+        );
+        console.log("Bot responses seeded");
 
-      // Assign responses to questions
-      botQuestions[0].possibleResponses = createdResponses.filter((response) =>
-          ["CheckIn"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[1].possibleResponses = createdResponses.filter((response) =>
-          ["RequestHelp", "ProvideFeedback"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[2].possibleResponses = createdResponses.filter((response) =>
-          ["ProvideFeedback", "ExpressGratitude"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[3].possibleResponses = createdResponses.filter((response) =>
-          ["ReportIssue"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[4].possibleResponses = createdResponses.filter((response) =>
-          ["SuggestImprovement"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[5].possibleResponses = createdResponses.filter((response) =>
-          ["SocialChat", "CheckIn"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
-      botQuestions[6].possibleResponses = createdResponses.filter((response) =>
-          ["RequestHelp", "CheckIn"].includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
-      ).map((response) => response._id);
+        // Assign responses to questions
+        const assignResponsesToQuestions = (intentNames) => {
+            const possibleResponses = createdResponses.filter((response) =>
+                intentNames.includes(createdIntents.find((intent) => intent._id.equals(response.intent)).name)
+            ).map((response) => response._id);
+            return possibleResponses;
+        };
 
-      // Update each question with their respective possible responses
-      for (let question of botQuestions) {
-          await BotQuestion.findByIdAndUpdate(
-              createdQuestions[botQuestions.indexOf(question)]._id,
-              { possibleResponses: question.possibleResponses },
-              { new: true }
-          );
-      }
+        for (let i = 0; i < createdQuestions.length; i++) {
+            const question = createdQuestions[i];
+            let possibleResponses = assignResponsesToQuestions(botIntents.map(intent => intent.name));
 
-      console.log("Bot data imported successfully!");
-      process.exit();
-  } catch (error) {
-      console.error(`Error: ${error.message}`);
-      process.exit(1);
-  }
+            if (!possibleResponses || possibleResponses.length === 0) {
+                console.warn(`Warning: Question "${question.questionText}" has no possible responses assigned.`);
+            } else {
+                await BotQuestion.findByIdAndUpdate(
+                    question._id,
+                    { possibleResponses: possibleResponses },
+                    { new: true }
+                );
+                console.log(`Question "${question.questionText}" updated with possible responses.`);
+            }
+        }
+
+        console.log("Bot data imported successfully!");
+        process.exit();
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+    }
 };
 
 importBotData();
