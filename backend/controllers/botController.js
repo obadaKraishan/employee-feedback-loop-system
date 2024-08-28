@@ -36,8 +36,8 @@ const handleResponse = async (req, res) => {
         const followUpQuestion = await botService.handleResponse(conversationId, questionId, responseId);
 
         if (!followUpQuestion) {
-            console.error('Failed to handle response:', { followUpQuestion });
-            return res.status(500).json({ message: 'Failed to handle response' });
+            // If no follow-up question, keep chat active
+            return res.json({ question: null });
         }
 
         console.log('Follow-up Question:', followUpQuestion); // Log the follow-up question

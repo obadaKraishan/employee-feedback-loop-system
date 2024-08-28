@@ -2,31 +2,55 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  .start-chat-btn,
-  .end-chat-btn {
+}
+
+.start-chat-btn,
+.end-chat-btn {
     background-color: #10b981;
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 10px;
-  }
-  
-  .start-chat-btn:hover,
-  .end-chat-btn:hover {
+}
+
+.start-chat-btn:hover,
+.end-chat-btn:hover {
     background-color: #059669;
-  }
-  
-  .chat-box {
+}
+
+.chat-box {
     width: 100%;
     max-width: 500px;
     height: 300px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     background-color: white;
-    overflow-y: scroll;
+    overflow-y: auto;
     padding: 20px;
-  }
-  
+}
+
+.chat-box .mb-2 {
+    display: block;
+    white-space: nowrap;
+}
+
+.letter-by-letter {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #333;
+    animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-right-color: transparent; }
+    50% { border-right-color: black; }
+}
