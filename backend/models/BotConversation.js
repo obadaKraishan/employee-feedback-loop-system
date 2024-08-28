@@ -1,3 +1,5 @@
+// backend/models/BotConversation.js
+
 const mongoose = require('mongoose');
 
 const botConversationSchema = new mongoose.Schema({

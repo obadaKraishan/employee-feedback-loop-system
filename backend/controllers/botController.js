@@ -1,16 +1,16 @@
 // backend/controllers/botController.js
+
 const botService = require('../services/botService');
 
 const startConversation = async (req, res) => {
     try {
-        // Ensure req.user (or req.employee) is defined
         console.log('User (Employee):', req.employee); // Log user details to verify
 
         if (!req.employee) {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        const { employeeId } = req.employee; // Extract employeeId from req.employee
+        const employeeId = req.employee._id; // Use _id (ObjectId) from req.employee
         console.log('Starting conversation for employeeId:', employeeId);
 
         const { conversation, firstQuestion } = await botService.startConversation(employeeId);

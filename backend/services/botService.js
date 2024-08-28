@@ -1,11 +1,19 @@
+// backend/services/botService.js
+
+const mongoose = require('mongoose');
 const BotQuestion = require('../models/BotQuestion');
 const BotResponse = require('../models/BotResponse');
 const BotConversation = require('../models/BotConversation');
 
 const startConversation = async (employeeId) => {
+  // Ensure employeeId is an ObjectId
+  if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+    throw new Error('Invalid employeeId');
+  }
+
   const firstQuestion = await BotQuestion.findOne({}).populate('possibleResponses');
   const conversation = await BotConversation.create({
-    employeeId,
+    employeeId: employeeId, // Use employeeId directly since it's already an ObjectId
     conversationHistory: [],
   });
   return { conversation, firstQuestion };
