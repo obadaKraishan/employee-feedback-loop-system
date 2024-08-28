@@ -1,4 +1,5 @@
 // backend/data/botSeed.js
+
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const BotQuestion = require("../models/BotQuestion");
@@ -83,36 +84,36 @@ const importBotData = async () => {
     console.log("Bot responses seeded");
 
     botQuestions[0].possibleResponses = createdResponses
-      .filter((response) => response.intent.name === "CheckIn")
+      .filter((response) => response.intent.toString() === createdIntents.find(intent => intent.name === "CheckIn")._id.toString())
       .map((response) => response._id);
     botQuestions[1].possibleResponses = createdResponses
       .filter(
         (response) =>
-          response.intent.name === "RequestHelp" || response.intent.name === "ProvideFeedback"
+          ["RequestHelp", "ProvideFeedback"].includes(createdIntents.find(intent => intent._id.toString() === response.intent.toString()).name)
       )
       .map((response) => response._id);
     botQuestions[2].possibleResponses = createdResponses
       .filter(
         (response) =>
-          response.intent.name === "ProvideFeedback" || response.intent.name === "ExpressGratitude"
+          ["ProvideFeedback", "ExpressGratitude"].includes(createdIntents.find(intent => intent._id.toString() === response.intent.toString()).name)
       )
       .map((response) => response._id);
     botQuestions[3].possibleResponses = createdResponses
-      .filter((response) => response.intent.name === "ReportIssue")
+      .filter((response) => response.intent.toString() === createdIntents.find(intent => intent.name === "ReportIssue")._id.toString())
       .map((response) => response._id);
     botQuestions[4].possibleResponses = createdResponses
-      .filter((response) => response.intent.name === "SuggestImprovement")
+      .filter((response) => response.intent.toString() === createdIntents.find(intent => intent.name === "SuggestImprovement")._id.toString())
       .map((response) => response._id);
     botQuestions[5].possibleResponses = createdResponses
       .filter(
         (response) =>
-          response.intent.name === "SocialChat" || response.intent.name === "CheckIn"
+          ["SocialChat", "CheckIn"].includes(createdIntents.find(intent => intent._id.toString() === response.intent.toString()).name)
       )
       .map((response) => response._id);
     botQuestions[6].possibleResponses = createdResponses
       .filter(
         (response) =>
-          response.intent.name === "RequestHelp" || response.intent.name === "CheckIn"
+          ["RequestHelp", "CheckIn"].includes(createdIntents.find(intent => intent._id.toString() === response.intent.toString()).name)
       )
       .map((response) => response._id);
 

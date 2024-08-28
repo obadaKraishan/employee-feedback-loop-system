@@ -1,5 +1,3 @@
-// backend/controllers/botController.js
-
 const botService = require('../services/botService');
 
 const startConversation = async (req, res) => {
@@ -20,6 +18,9 @@ const startConversation = async (req, res) => {
             return res.status(500).json({ message: 'Failed to start conversation' });
         }
 
+        console.log('First Question:', firstQuestion); // Log the first question
+        console.log('Possible Responses:', firstQuestion.possibleResponses); // Log possible responses
+
         res.json({ conversationId: conversation._id, question: firstQuestion });
     } catch (error) {
         console.error('Error in startConversation:', error);
@@ -38,6 +39,9 @@ const handleResponse = async (req, res) => {
             console.error('Failed to handle response:', { followUpQuestion });
             return res.status(500).json({ message: 'Failed to handle response' });
         }
+
+        console.log('Follow-up Question:', followUpQuestion); // Log the follow-up question
+        console.log('Possible Responses:', followUpQuestion.possibleResponses); // Log possible responses
 
         res.json({ question: followUpQuestion });
     } catch (error) {

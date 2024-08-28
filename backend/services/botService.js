@@ -1,5 +1,3 @@
-// backend/services/botService.js
-
 const mongoose = require('mongoose');
 const BotQuestion = require('../models/BotQuestion');
 const BotResponse = require('../models/BotResponse');
@@ -22,7 +20,7 @@ const startConversation = async (employeeId) => {
 const handleResponse = async (conversationId, questionId, responseId) => {
   const conversation = await BotConversation.findById(conversationId);
   const question = await BotQuestion.findById(questionId);
-  const response = await BotResponse.findById(responseId);
+  const response = await BotResponse.findById(responseId).populate('followUpQuestion');
 
   conversation.conversationHistory.push({ question: questionId, response: responseId });
   await conversation.save();
@@ -31,7 +29,7 @@ const handleResponse = async (conversationId, questionId, responseId) => {
   if (!followUpQuestion) {
     followUpQuestion = await BotQuestion.findOne({}).populate('possibleResponses');
   } else {
-    followUpQuestion = await BotQuestion.findById(followUpQuestion).populate('possibleResponses');
+    followUpQuestion = await BotQuestion.findById(followUpQuestion._id).populate('possibleResponses');
   }
 
   return followUpQuestion;

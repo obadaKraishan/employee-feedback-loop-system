@@ -1,0 +1,32 @@
+.bot-interaction-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .start-chat-btn,
+  .end-chat-btn {
+    background-color: #10b981;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  
+  .start-chat-btn:hover,
+  .end-chat-btn:hover {
+    background-color: #059669;
+  }
+  
+  .chat-box {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    overflow-y: scroll;
+    padding: 20px;
+  }
+  
