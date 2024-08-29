@@ -30,15 +30,12 @@ const importBotData = async () => {
         const createdEntities = await BotEntity.insertMany(botEntities);
         console.log("Bot entities seeded");
 
-        const createdQuestions = await BotQuestion.insertMany(botQuestions);
-        console.log("Bot questions seeded");
-
-        // Seed responses with follow-up questions and intent references
+        // First, insert all responses and capture their IDs
         const createdResponses = await BotResponse.insertMany(
             botResponses.map((response) => {
                 let followUpQuestion = null;
-                if (typeof response.followUpQuestionIndex === 'number' && response.followUpQuestionIndex < createdQuestions.length) {
-                    followUpQuestion = createdQuestions[response.followUpQuestionIndex]._id;
+                if (typeof response.followUpQuestionIndex === 'number' && response.followUpQuestionIndex < botQuestions.length) {
+                    followUpQuestion = botQuestions[response.followUpQuestionIndex]._id;
                 }
                 return {
                     ...response,
@@ -49,24 +46,22 @@ const importBotData = async () => {
         );
         console.log("Bot responses seeded");
 
-        // Assign responses to their respective questions
-        for (let i = 0; i < createdQuestions.length; i++) {
-            const question = createdQuestions[i];
-            const possibleResponses = createdResponses
-                .filter(response => response.followUpQuestion === null || response.followUpQuestion.equals(question._id))
-                .map(response => response._id);
-
-            if (possibleResponses.length === 0) {
-                console.warn(`Warning: Question "${question.questionText}" has no possible responses assigned.`);
-            } else {
-                await BotQuestion.findByIdAndUpdate(
-                    question._id,
-                    { possibleResponses: possibleResponses },
-                    { new: true }
-                );
-                console.log(`Question "${question.questionText}" updated with possible responses.`);
-            }
-        }
+        // Now, map each question's possibleResponses to the corresponding BotResponse ObjectId
+        const createdQuestions = await BotQuestion.insertMany(
+            botQuestions.map((question) => {
+                const possibleResponses = question.possibleResponses.map(response => {
+                    const matchingResponse = createdResponses.find(
+                        res => res.responseText === response.responseText && res.intent.toString() === createdIntents.find(intent => intent.name === response.intent)._id.toString()
+                    );
+                    return matchingResponse ? matchingResponse._id : null;
+                }).filter(Boolean); // Remove any null values
+                return {
+                    ...question,
+                    possibleResponses: possibleResponses,
+                };
+            })
+        );
+        console.log("Bot questions seeded");
 
         console.log("Bot data imported successfully!");
         process.exit();

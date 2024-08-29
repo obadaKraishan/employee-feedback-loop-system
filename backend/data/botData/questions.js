@@ -3,9 +3,9 @@ const botQuestions = [
     {
         questionText: "How are you feeling today?",
         possibleResponses: [
-            { responseText: "I am feeling great!", action: "suggest_feedback", intent: "CheckIn", followUpQuestionIndex: null },
+            { responseText: "I am feeling great!", action: "suggest_feedback", intent: "CheckIn", followUpQuestionIndex: 2 },
             { responseText: "I am a bit stressed.", action: "suggest_help", intent: "CheckIn", followUpQuestionIndex: 1 },
-            { responseText: "I have been feeling anxious lately.", action: "provide_emotional_support", intent: "EmotionalSupport", followUpQuestionIndex: null }
+            { responseText: "I have been feeling anxious lately.", action: "provide_emotional_support", intent: "EmotionalSupport", followUpQuestionIndex: 4 }
         ]
     },
     {
@@ -885,5 +885,4 @@ const botQuestions = [
     }
     ];
     
-    module.exports = botQuestions;
-    
+module.exports = botQuestions;
